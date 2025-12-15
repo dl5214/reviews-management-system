@@ -69,9 +69,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
-      {/* Profile Header */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-2xl mx-auto">
+        {/* Profile Header */}
+        <div className="bg-white rounded-xl border border-teal-200 p-6 mb-6">
         <div className="flex items-center gap-4 mb-6">
           <div className="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center">
             <span className="text-white text-2xl font-bold">D</span>
@@ -130,7 +131,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Overview Stats */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+      <div className="bg-white rounded-xl border border-teal-200 p-6 mb-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">Overview</h2>
         
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
@@ -190,7 +191,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Quick Links */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+      <div className="bg-white rounded-xl border border-teal-200 p-6 mb-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">Quick Links</h2>
         
         <div className="space-y-2">
@@ -205,7 +206,7 @@ export default function ProfilePage() {
               <span className="font-medium text-slate-700">Review Tasks</span>
             </div>
             {stats.pendingCount > 0 && (
-              <span className="px-2 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded">
+              <span className="px-2 py-1 bg-amber-100 text-amber-700 text-sm font-medium rounded">
                 {stats.pendingCount} pending
               </span>
             )}
@@ -232,7 +233,7 @@ export default function ProfilePage() {
       {/* Logout */}
       <button
         onClick={handleLogout}
-        className="w-full flex items-center justify-center gap-2 p-4 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors font-medium"
+        className="w-full flex items-center justify-center gap-2 p-4 border border-teal-200 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors font-medium"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -240,10 +241,11 @@ export default function ProfilePage() {
         Logout
       </button>
 
-      {/* Demo notice */}
-      <p className="text-center text-sm text-slate-400 mt-6">
-        Demo account for demonstration purposes
-      </p>
+        {/* Demo notice */}
+        <p className="text-center text-sm text-slate-400 mt-6">
+          Demo account for demonstration purposes
+        </p>
+      </div>
     </div>
   );
 }

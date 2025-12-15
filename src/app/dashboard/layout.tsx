@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { BottomNav } from "@/components/dashboard/BottomNav";
+import { NavTabs } from "@/components/dashboard/NavTabs";
 import { useState, useEffect } from "react";
 
 export default function DashboardLayout({
@@ -124,7 +124,7 @@ export default function DashboardLayout({
       </header>
 
       {/* Navigation Tabs */}
-      <BottomNav />
+      <NavTabs />
 
       {/* Main Content */}
       <main>{children}</main>
