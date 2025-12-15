@@ -20,6 +20,8 @@ export interface HostawayReview {
   channelName?: string;
 }
 
+export type ApprovalStatus = "approved" | "pending" | "rejected";
+
 // Normalized review for frontend consumption
 export interface NormalizedReview {
   id: number;
@@ -43,7 +45,7 @@ export interface NormalizedReview {
   listingId: string;
   listingName: string;
   channel: string;
-  isApproved: boolean;
+  approvalStatus: ApprovalStatus;
 }
 
 // Listing summary for dashboard

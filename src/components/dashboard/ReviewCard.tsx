@@ -1,11 +1,12 @@
 "use client";
 
-import { NormalizedReview } from "@/types/review";
+import { useState, useRef, useEffect } from "react";
+import { NormalizedReview, ApprovalStatus } from "@/types/review";
 import { StarRating } from "./StarRating";
 
 interface ReviewCardProps {
   review: NormalizedReview;
-  onToggleApproval: (reviewId: number) => void;
+  onUpdateStatus: (reviewId: number, status: ApprovalStatus) => void;
   isUpdating?: boolean;
 }
 
@@ -17,6 +18,17 @@ function getChannelColor(channel: string): string {
     Direct: "bg-slate-100 text-slate-700 border-slate-200",
   };
   return colors[channel] || colors.Direct;
+}
+
+function getStatusStyle(status: ApprovalStatus): { bg: string; text: string; label: string } {
+  switch (status) {
+    case "approved":
+      return { bg: "bg-emerald-100", text: "text-emerald-700", label: "Approved" };
+    case "rejected":
+      return { bg: "bg-rose-100", text: "text-rose-700", label: "Rejected" };
+    default:
+      return { bg: "bg-amber-100", text: "text-amber-700", label: "Pending" };
+  }
 }
 
 function formatDate(dateString: string): string {
@@ -43,18 +55,94 @@ function getRelativeTime(dateString: string): string {
   return `${Math.floor(diffInDays / 365)} years ago`;
 }
 
+function StatusDropdown({
+  currentStatus,
+  onStatusChange,
+  isUpdating,
+}: {
+  currentStatus: ApprovalStatus;
+  onStatusChange: (status: ApprovalStatus) => void;
+  isUpdating?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const statusStyle = getStatusStyle(currentStatus);
+  const statuses: { value: ApprovalStatus; label: string; color: string }[] = [
+    { value: "pending", label: "Pending", color: "text-amber-600" },
+    { value: "approved", label: "Approved", color: "text-emerald-600" },
+    { value: "rejected", label: "Rejected", color: "text-rose-600" },
+  ];
+
+  if (isUpdating) {
+    return (
+      <div className="flex items-center gap-2 px-3 py-1.5">
+        <svg className="animate-spin h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={dropdownRef} className="relative z-20">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${statusStyle.bg} ${statusStyle.text} hover:opacity-80`}
+      >
+        {statusStyle.label}
+        <svg className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-1 w-36 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50">
+          {statuses.map((status) => (
+            <button
+              key={status.value}
+              onClick={() => {
+                onStatusChange(status.value);
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 flex items-center gap-2 ${
+                currentStatus === status.value ? "font-medium" : ""
+              } ${status.color}`}
+            >
+              {currentStatus === status.value && (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+              <span className={currentStatus === status.value ? "" : "ml-6"}>{status.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ReviewCard({
   review,
-  onToggleApproval,
+  onUpdateStatus,
   isUpdating,
 }: ReviewCardProps) {
   const categoryLabels: Record<string, string> = {
     cleanliness: "Cleanliness",
     communication: "Communication",
-    checkIn: "Check-in",
-    accuracy: "Accuracy",
-    location: "Location",
-    value: "Value",
+    respectHouseRules: "House Rules",
   };
 
   const categoryEntries = Object.entries(review.categories).filter(
@@ -63,23 +151,28 @@ export function ReviewCard({
 
   return (
     <div
-      className={`relative bg-white rounded-2xl border transition-all duration-200 overflow-hidden ${
-        review.isApproved
-          ? "border-emerald-200 shadow-md shadow-emerald-100/50"
-          : "border-slate-200 shadow-sm hover:shadow-md"
+      className={`relative bg-white rounded-2xl border shadow-sm transition-all duration-200 overflow-visible ${
+        review.approvalStatus === "approved"
+          ? "border-emerald-200"
+          : review.approvalStatus === "rejected"
+          ? "border-rose-200"
+          : "border-slate-200"
       }`}
     >
-      {/* Approved indicator bar */}
-      {review.isApproved && (
+      {/* Status indicator bar */}
+      {review.approvalStatus === "approved" && (
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400" />
+      )}
+      {review.approvalStatus === "rejected" && (
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 to-pink-400" />
       )}
 
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-slate-800 truncate">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3 className="font-semibold text-slate-800">
                 {review.guestName}
               </h3>
               <span
@@ -104,7 +197,7 @@ export function ReviewCard({
         </div>
 
         {/* Review content */}
-        <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-3">
+        <p className="text-slate-600 text-sm leading-relaxed mb-4">
           {review.publicReview}
         </p>
 
@@ -127,78 +220,15 @@ export function ReviewCard({
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-          <span className="text-xs text-slate-400">ID: {review.id}</span>
-
-          <button
-            onClick={() => onToggleApproval(review.id)}
-            disabled={isUpdating}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              review.isApproved
-                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            } ${isUpdating ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            {isUpdating ? (
-              <svg
-                className="animate-spin h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-            ) : review.isApproved ? (
-              <>
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Approved
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-                Approve for Website
-              </>
-            )}
-          </button>
+        {/* Footer with status dropdown */}
+        <div className="flex items-center justify-end">
+          <StatusDropdown
+            currentStatus={review.approvalStatus}
+            onStatusChange={(status) => onUpdateStatus(review.id, status)}
+            isUpdating={isUpdating}
+          />
         </div>
       </div>
     </div>
   );
 }
-

@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
 import { mockHostawayReviews } from "@/lib/mock-data";
-import { getApprovedReviewIds, isReviewApproved } from "@/lib/store";
+import { getReviewStatus } from "@/lib/store";
 import { NormalizedReview } from "@/types/review";
 
-// Convert Hostaway rating (1-10) to standard (1-5)
+// Keep Hostaway rating as-is (1-10 scale)
 function convertRating(rating: number | null): number | null {
   if (rating === null) return null;
-  return Math.round((rating / 10) * 5 * 10) / 10;
+  return Math.round(rating * 10) / 10;
+}
+
+// Calculate average from category ratings (keep 10-scale)
+function calculateAverageFromCategories(
+  categories: { category: string; rating: number }[]
+): number | null {
+  const validRatings = categories.filter((c) => c.rating !== null);
+  if (validRatings.length === 0) return null;
+  const sum = validRatings.reduce((acc, c) => acc + c.rating, 0);
+  return Math.round((sum / validRatings.length) * 10) / 10;
 }
 
 // Normalize category name to camelCase key
@@ -29,21 +39,10 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const listingId = searchParams.get("listingId");
 
-  // Get approved review IDs
-  const approvedIds = getApprovedReviewIds();
-
-  if (approvedIds.length === 0) {
-    return NextResponse.json({
-      status: "success",
-      result: [],
-      meta: { total: 0 },
-    });
-  }
-
   // Filter to only approved guest-to-host reviews
   let approvedReviews = mockHostawayReviews.filter(
     (review) =>
-      isReviewApproved(review.id) &&
+      getReviewStatus(review.id) === "approved" &&
       review.type === "guest-to-host" &&
       review.status === "published"
   );
@@ -67,12 +66,20 @@ export async function GET(request: Request) {
       }
     });
 
+    // Calculate average rating from categories (10-scale)
+    let averageRating: number | null = null;
+    if (review.rating !== null) {
+      averageRating = review.rating;
+    } else {
+      averageRating = calculateAverageFromCategories(review.reviewCategory);
+    }
+
     return {
       id: review.id,
       type: review.type,
       status: review.status,
       rating: review.rating,
-      averageRating: review.rating,
+      averageRating,
       publicReview: review.publicReview,
       categories,
       submittedAt: review.submittedAt,
@@ -80,7 +87,7 @@ export async function GET(request: Request) {
       listingId: review.listingId?.toString() || "unknown",
       listingName: review.listingName,
       channel: review.channelName || "Direct",
-      isApproved: true,
+      approvalStatus: "approved",
     };
   });
 
@@ -95,4 +102,3 @@ export async function GET(request: Request) {
     meta: { total: publicReviews.length },
   });
 }
-

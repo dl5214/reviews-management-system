@@ -1,16 +1,11 @@
 import { NextResponse } from "next/server";
-import {
-  toggleReviewApproval,
-  setReviewApproval,
-  approveReviews,
-  unapproveReviews,
-} from "@/lib/store";
+import { setReviewStatus, getReviewStatus, ReviewStatus } from "@/lib/store";
 
-// Toggle single review approval
+// Update single review status
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { reviewId, approved } = body;
+    const { reviewId, status } = body;
 
     if (typeof reviewId !== "number") {
       return NextResponse.json(
@@ -19,22 +14,20 @@ export async function POST(request: Request) {
       );
     }
 
-    let newStatus: boolean;
-
-    if (typeof approved === "boolean") {
-      // Set specific approval status
-      setReviewApproval(reviewId, approved);
-      newStatus = approved;
-    } else {
-      // Toggle approval status
-      newStatus = toggleReviewApproval(reviewId);
+    if (!["approved", "pending", "rejected"].includes(status)) {
+      return NextResponse.json(
+        { status: "error", message: "status must be 'approved', 'pending', or 'rejected'" },
+        { status: 400 }
+      );
     }
+
+    setReviewStatus(reviewId, status as ReviewStatus);
 
     return NextResponse.json({
       status: "success",
       result: {
         reviewId,
-        isApproved: newStatus,
+        approvalStatus: getReviewStatus(reviewId),
       },
     });
   } catch {
@@ -45,11 +38,11 @@ export async function POST(request: Request) {
   }
 }
 
-// Bulk approve/unapprove reviews
+// Bulk update review statuses
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { reviewIds, approved } = body;
+    const { reviewIds, status } = body;
 
     if (!Array.isArray(reviewIds)) {
       return NextResponse.json(
@@ -58,24 +51,22 @@ export async function PUT(request: Request) {
       );
     }
 
-    if (typeof approved !== "boolean") {
+    if (!["approved", "pending", "rejected"].includes(status)) {
       return NextResponse.json(
-        { status: "error", message: "approved must be a boolean" },
+        { status: "error", message: "status must be 'approved', 'pending', or 'rejected'" },
         { status: 400 }
       );
     }
 
-    if (approved) {
-      approveReviews(reviewIds);
-    } else {
-      unapproveReviews(reviewIds);
-    }
+    reviewIds.forEach((id: number) => {
+      setReviewStatus(id, status as ReviewStatus);
+    });
 
     return NextResponse.json({
       status: "success",
       result: {
         reviewIds,
-        isApproved: approved,
+        approvalStatus: status,
       },
     });
   } catch {
@@ -85,4 +76,3 @@ export async function PUT(request: Request) {
     );
   }
 }
-

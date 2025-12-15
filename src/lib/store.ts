@@ -1,40 +1,70 @@
-// In-memory store for approved reviews
+// In-memory store for review approval status
 // In production, this would be a database
 
-const approvedReviewIds: Set<number> = new Set();
+export type ReviewStatus = "approved" | "pending" | "rejected";
 
-export function isReviewApproved(reviewId: number): boolean {
-  return approvedReviewIds.has(reviewId);
+// Extend global to persist data across hot reloads in development
+declare global {
+  // eslint-disable-next-line no-var
+  var reviewStatuses: Map<number, ReviewStatus> | undefined;
 }
 
-export function setReviewApproval(reviewId: number, approved: boolean): void {
-  if (approved) {
-    approvedReviewIds.add(reviewId);
+// Use global variable to persist across hot reloads
+if (!global.reviewStatuses) {
+  global.reviewStatuses = new Map<number, ReviewStatus>();
+}
+
+const reviewStatuses = global.reviewStatuses;
+
+export function getReviewStatus(reviewId: number): ReviewStatus {
+  return reviewStatuses.get(reviewId) || "pending";
+}
+
+export function setReviewStatus(reviewId: number, status: ReviewStatus): void {
+  if (status === "pending") {
+    reviewStatuses.delete(reviewId);
   } else {
-    approvedReviewIds.delete(reviewId);
+    reviewStatuses.set(reviewId, status);
   }
 }
 
-export function getApprovedReviewIds(): number[] {
-  return Array.from(approvedReviewIds);
+export function getReviewsByStatus(status: ReviewStatus): number[] {
+  if (status === "pending") {
+    // Pending means not in the map
+    return [];
+  }
+  return Array.from(reviewStatuses.entries())
+    .filter(([, s]) => s === status)
+    .map(([id]) => id);
 }
 
+export function getApprovedReviewIds(): number[] {
+  return Array.from(reviewStatuses.entries())
+    .filter(([, status]) => status === "approved")
+    .map(([id]) => id);
+}
+
+export function isReviewApproved(reviewId: number): boolean {
+  return reviewStatuses.get(reviewId) === "approved";
+}
+
+// For backwards compatibility
 export function toggleReviewApproval(reviewId: number): boolean {
-  if (approvedReviewIds.has(reviewId)) {
-    approvedReviewIds.delete(reviewId);
+  const current = getReviewStatus(reviewId);
+  if (current === "approved") {
+    setReviewStatus(reviewId, "pending");
     return false;
   } else {
-    approvedReviewIds.add(reviewId);
+    setReviewStatus(reviewId, "approved");
     return true;
   }
 }
 
-// Bulk operations
-export function approveReviews(reviewIds: number[]): void {
-  reviewIds.forEach((id) => approvedReviewIds.add(id));
+// Get all statuses for multiple reviews
+export function getReviewStatuses(reviewIds: number[]): Map<number, ReviewStatus> {
+  const result = new Map<number, ReviewStatus>();
+  reviewIds.forEach((id) => {
+    result.set(id, getReviewStatus(id));
+  });
+  return result;
 }
-
-export function unapproveReviews(reviewIds: number[]): void {
-  reviewIds.forEach((id) => approvedReviewIds.delete(id));
-}
-
