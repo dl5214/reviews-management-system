@@ -290,7 +290,7 @@ export default function TasksPage() {
                         {categoryLabels[key] || key.replace(/([A-Z])/g, ' $1').trim()}
                       </span>
                       <span className="text-sm font-semibold text-slate-700">
-                        {value.toFixed(1)}
+                        {value.toFixed(2)}
                       </span>
                     </div>
                   ))}

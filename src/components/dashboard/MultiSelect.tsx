@@ -161,7 +161,7 @@ export function RatingMultiSelect({
       ? "All"
       : selected
           .sort((a, b) => b - a)
-          .map((r) => `${r - 1}-${r}`)
+          .map((r) => `${r}★`)
           .join(", ");
 
   return (
@@ -198,7 +198,7 @@ export function RatingMultiSelect({
 
       {isOpen && (
         <div className="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg py-1">
-          {[10, 8, 6, 4, 2].map((rating) => {
+          {[5, 4, 3, 2, 1].map((rating) => {
             const isSelected = selected.includes(rating);
             return (
               <label
@@ -216,7 +216,7 @@ export function RatingMultiSelect({
                     isSelected ? "text-slate-800 font-medium" : "text-slate-600"
                   }`}
                 >
-                  {rating - 1}-{rating}
+                  {rating}★
                 </span>
               </label>
             );

@@ -19,12 +19,12 @@ export function StatsCards({ reviews }: StatsCardsProps) {
         reviewsWithRating.length
       : 0;
 
-  // Calculate rating distribution (10-scale, grouped by 2)
-  const ratingDistribution = [10, 8, 6, 4, 2].map((rating) => {
+  // Calculate rating distribution (5-scale)
+  const ratingDistribution = [5, 4, 3, 2, 1].map((rating) => {
     const count = reviews.filter(
       (r) =>
         r.averageRating !== null &&
-        r.averageRating > rating - 2 &&
+        r.averageRating > rating - 1 &&
         r.averageRating <= rating
     ).length;
     return { rating, count, percentage: totalReviews > 0 ? (count / totalReviews) * 100 : 0 };
@@ -131,8 +131,8 @@ export function StatsCards({ reviews }: StatsCardsProps) {
         <div className="space-y-2 sm:space-y-3">
           {ratingDistribution.map((item) => (
             <div key={item.rating} className="flex items-center gap-2 sm:gap-3">
-              <span className="text-xs sm:text-sm font-medium text-slate-600 w-10 sm:w-12 shrink-0">
-                {item.rating - 1}-{item.rating}
+              <span className="text-xs sm:text-sm font-medium text-slate-600 w-8 sm:w-10 shrink-0">
+                {item.rating}★
               </span>
               <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div

@@ -3,20 +3,21 @@ import { mockHostawayReviews } from "@/lib/mock-data";
 import { getReviewStatus } from "@/lib/store";
 import { NormalizedReview } from "@/types/review";
 
-// Keep Hostaway rating as-is (1-10 scale)
+// Convert Hostaway rating (1-10) to 5-star scale, keep 2 decimal places
 function convertRating(rating: number | null): number | null {
   if (rating === null) return null;
-  return Math.round(rating * 10) / 10;
+  return Math.round((rating / 2) * 100) / 100;
 }
 
-// Calculate average from category ratings (keep 10-scale)
+// Calculate average from category ratings (convert to 5-scale)
 function calculateAverageFromCategories(
   categories: { category: string; rating: number }[]
 ): number | null {
   const validRatings = categories.filter((c) => c.rating !== null);
   if (validRatings.length === 0) return null;
   const sum = validRatings.reduce((acc, c) => acc + c.rating, 0);
-  return Math.round((sum / validRatings.length) * 10) / 10;
+  const avg10 = sum / validRatings.length;
+  return Math.round((avg10 / 2) * 100) / 100;
 }
 
 // Normalize category name to camelCase key

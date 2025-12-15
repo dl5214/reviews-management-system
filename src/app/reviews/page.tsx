@@ -138,9 +138,9 @@ export default function PublicReviewsPage() {
             <div className="inline-flex items-center gap-4 px-6 py-3 bg-white/10 rounded-xl backdrop-blur-sm">
               <div className="flex items-center gap-2">
                 <span className="text-3xl font-bold text-white">
-                  {avgRating.toFixed(1)}
+                  {avgRating.toFixed(2)}
                 </span>
-                <StarRating rating={avgRating} size="lg" />
+                <StarRating rating={avgRating} size="lg" showNumber={false} />
               </div>
               <div className="w-px h-8 bg-white/30" />
               <span className="text-teal-100">
