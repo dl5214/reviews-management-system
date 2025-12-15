@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PropertyReviews } from "@/components/property/PropertyReviews";
 
 // Mock property data
@@ -13,11 +14,11 @@ const properties: Record<
     bedrooms: number;
     bathrooms: number;
     guests: number;
-    images: string[];
+    image: string;
   }
 > = {
   "1001": {
-    name: "Shoreditch Heights 2BR",
+    name: "Shoreditch Heights",
     description:
       "Experience the vibrant heart of East London in this stunning 2-bedroom apartment. Located in the creative hub of Shoreditch, you'll be surrounded by world-class street art, trendy cafes, and some of London's best nightlife. The apartment features floor-to-ceiling windows with city views, a fully equipped modern kitchen, and designer furnishings throughout.",
     location: "Shoreditch, London E1",
@@ -35,7 +36,7 @@ const properties: Record<
     bedrooms: 2,
     bathrooms: 1,
     guests: 4,
-    images: ["/property-1.jpg"],
+    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&h=800&fit=crop",
   },
   "1002": {
     name: "Canary Wharf Studio",
@@ -56,10 +57,10 @@ const properties: Record<
     bedrooms: 0,
     bathrooms: 1,
     guests: 2,
-    images: ["/property-2.jpg"],
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=800&fit=crop",
   },
   "1003": {
-    name: "Camden Town 1BR",
+    name: "Camden Town Apartment",
     description:
       "Immerse yourself in Camden's iconic alternative culture from this charming 1-bedroom apartment. Just steps from Camden Market and the canal, this unique property combines vintage charm with modern comfort. Enjoy the eclectic neighborhood by day and return to a cozy retreat at night.",
     location: "Camden Town, London NW1",
@@ -75,10 +76,10 @@ const properties: Record<
     bedrooms: 1,
     bathrooms: 1,
     guests: 2,
-    images: ["/property-3.jpg"],
+    image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&h=800&fit=crop",
   },
   "1004": {
-    name: "Kensington Luxury 3BR",
+    name: "Kensington Luxury",
     description:
       "Indulge in luxury living in one of London's most prestigious neighborhoods. This exquisite 3-bedroom apartment offers elegant interiors, premium furnishings, and unparalleled attention to detail. Walking distance to Hyde Park, world-class museums, and Kensington Palace.",
     location: "Kensington, London W8",
@@ -97,10 +98,10 @@ const properties: Record<
     bedrooms: 3,
     bathrooms: 2,
     guests: 6,
-    images: ["/property-4.jpg"],
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop",
   },
   "1005": {
-    name: "Greenwich View 1BR",
+    name: "Greenwich View",
     description:
       "Wake up to stunning views of the Cutty Sark and the River Thames in this beautiful 1-bedroom apartment. Located in historic Greenwich, you'll have easy access to maritime museums, Greenwich Park, and the famous market. The apartment features a private balcony perfect for morning coffee.",
     location: "Greenwich, London SE10",
@@ -117,7 +118,26 @@ const properties: Record<
     bedrooms: 1,
     bathrooms: 1,
     guests: 2,
-    images: ["/property-5.jpg"],
+    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&h=800&fit=crop",
+  },
+  "1006": {
+    name: "Notting Hill Flat",
+    description:
+      "A charming 2-bedroom apartment in the heart of Notting Hill. Enjoy the famous Portobello Road Market, beautiful gardens, and vibrant local cafes. This stylish flat combines period features with modern amenities for a truly unique London experience.",
+    location: "Notting Hill, London W11",
+    amenities: [
+      "WiFi",
+      "Smart TV",
+      "Kitchen",
+      "Washer/Dryer",
+      "Heating",
+      "Garden access",
+    ],
+    price: 195,
+    bedrooms: 2,
+    bathrooms: 1,
+    guests: 4,
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop",
   },
 };
 
@@ -131,17 +151,17 @@ export default async function PropertyPage({
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-800 mb-2">
             Property Not Found
           </h1>
           <p className="text-slate-500 mb-4">
-            The property you're looking for doesn't exist.
+            The property you&apos;re looking for doesn&apos;t exist.
           </p>
           <Link
             href="/"
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
+            className="text-teal-600 hover:text-teal-700 font-medium"
           >
             ← Back to Home
           </Link>
@@ -151,39 +171,54 @@ export default async function PropertyPage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">FL</span>
               </div>
-              <span className="font-bold text-xl text-slate-800">
+              <span className="font-semibold text-xl text-slate-800">
                 Flex Living
               </span>
             </Link>
-            <Link
-              href="/dashboard"
-              className="text-sm text-slate-500 hover:text-slate-700"
-            >
-              Manager Dashboard →
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="text-sm text-slate-600 hover:text-slate-800"
+              >
+                ← Back to Properties
+              </Link>
+              <Link
+                href="/login"
+                className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+              >
+                Manager Login
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Image */}
-      <div className="relative h-[400px] bg-gradient-to-br from-indigo-900 via-violet-800 to-purple-900">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white">
-            <p className="text-indigo-200 mb-2">Flex Living</p>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+      <div className="relative h-[400px] md:h-[500px]">
+        <Image
+          src={property.image}
+          alt={property.name}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-teal-300 text-sm font-medium mb-2">Flex Living</p>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
               {property.name}
             </h1>
-            <p className="text-lg text-indigo-100 flex items-center justify-center gap-2">
+            <p className="text-white/80 flex items-center gap-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -198,124 +233,145 @@ export default async function PropertyPage({
       </div>
 
       {/* Property Details */}
-      <div className="max-w-4xl mx-auto px-6 -mt-16 relative z-10">
-        {/* Quick Info Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl mb-1">🛏️</div>
-              <div className="text-2xl font-bold text-slate-800">
-                {property.bedrooms || "Studio"}
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Quick Info */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-slate-50 rounded-xl">
+                <div className="text-2xl mb-1">🛏️</div>
+                <div className="text-lg font-bold text-slate-800">
+                  {property.bedrooms || "Studio"}
+                </div>
+                <div className="text-sm text-slate-500">
+                  {property.bedrooms === 1 ? "Bedroom" : property.bedrooms ? "Bedrooms" : ""}
+                </div>
               </div>
-              <div className="text-sm text-slate-500">
-                {property.bedrooms === 1
-                  ? "Bedroom"
-                  : property.bedrooms
-                  ? "Bedrooms"
-                  : ""}
+              <div className="text-center p-4 bg-slate-50 rounded-xl">
+                <div className="text-2xl mb-1">🚿</div>
+                <div className="text-lg font-bold text-slate-800">
+                  {property.bathrooms}
+                </div>
+                <div className="text-sm text-slate-500">
+                  {property.bathrooms === 1 ? "Bathroom" : "Bathrooms"}
+                </div>
+              </div>
+              <div className="text-center p-4 bg-slate-50 rounded-xl">
+                <div className="text-2xl mb-1">👥</div>
+                <div className="text-lg font-bold text-slate-800">
+                  {property.guests}
+                </div>
+                <div className="text-sm text-slate-500">Guests</div>
+              </div>
+              <div className="text-center p-4 bg-slate-50 rounded-xl">
+                <div className="text-2xl mb-1">📍</div>
+                <div className="text-lg font-bold text-slate-800">Zone 1-2</div>
+                <div className="text-sm text-slate-500">London</div>
               </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl mb-1">🚿</div>
-              <div className="text-2xl font-bold text-slate-800">
-                {property.bathrooms}
+
+            {/* Description */}
+            <section>
+              <h2 className="text-xl font-bold text-slate-800 mb-4">
+                About This Property
+              </h2>
+              <p className="text-slate-600 leading-relaxed">
+                {property.description}
+              </p>
+            </section>
+
+            {/* Amenities */}
+            <section>
+              <h2 className="text-xl font-bold text-slate-800 mb-4">Amenities</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {property.amenities.map((amenity) => (
+                  <div
+                    key={amenity}
+                    className="flex items-center gap-2 text-slate-600 p-3 bg-slate-50 rounded-lg"
+                  >
+                    <svg
+                      className="w-5 h-5 text-teal-500 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span className="text-sm">{amenity}</span>
+                  </div>
+                ))}
               </div>
-              <div className="text-sm text-slate-500">
-                {property.bathrooms === 1 ? "Bathroom" : "Bathrooms"}
+            </section>
+          </div>
+
+          {/* Sidebar - Booking Card */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 bg-white border border-slate-200 rounded-xl p-6 shadow-lg">
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-3xl font-bold text-slate-800">
+                  £{property.price}
+                </span>
+                <span className="text-slate-500">/ night</span>
               </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl mb-1">👥</div>
-              <div className="text-2xl font-bold text-slate-800">
-                {property.guests}
+              
+              <div className="space-y-4 mb-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 border border-slate-200 rounded-lg">
+                    <p className="text-xs text-slate-500 mb-1">Check-in</p>
+                    <p className="font-medium text-slate-800">Select date</p>
+                  </div>
+                  <div className="p-3 border border-slate-200 rounded-lg">
+                    <p className="text-xs text-slate-500 mb-1">Check-out</p>
+                    <p className="font-medium text-slate-800">Select date</p>
+                  </div>
+                </div>
+                <div className="p-3 border border-slate-200 rounded-lg">
+                  <p className="text-xs text-slate-500 mb-1">Guests</p>
+                  <p className="font-medium text-slate-800">1 guest</p>
+                </div>
               </div>
-              <div className="text-sm text-slate-500">Guests</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl mb-1">💷</div>
-              <div className="text-2xl font-bold text-slate-800">
-                £{property.price}
+
+              <button className="w-full py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors mb-4">
+                Check Availability
+              </button>
+
+              <p className="text-center text-sm text-slate-500">
+                You won&apos;t be charged yet
+              </p>
+
+              <div className="mt-6 pt-6 border-t border-slate-200">
+                <p className="text-xs text-slate-400 text-center">
+                  Demo Version - Booking not functional
+                </p>
               </div>
-              <div className="text-sm text-slate-500">per night</div>
             </div>
           </div>
         </div>
-
-        {/* Description */}
-        <section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <h2 className="text-2xl font-bold text-slate-800 mb-4">
-            About This Property
-          </h2>
-          <p className="text-slate-600 leading-relaxed text-lg">
-            {property.description}
-          </p>
-        </section>
-
-        {/* Amenities */}
-        <section className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <h2 className="text-2xl font-bold text-slate-800 mb-6">Amenities</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {property.amenities.map((amenity) => (
-              <div
-                key={amenity}
-                className="flex items-center gap-2 text-slate-600"
-              >
-                <svg
-                  className="w-5 h-5 text-emerald-500 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span>{amenity}</span>
-              </div>
-            ))}
-          </div>
-        </section>
       </div>
 
       {/* Reviews Section */}
-      <div className="bg-slate-50 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden mx-6">
-            <PropertyReviews listingId={listingId} />
-          </div>
-        </div>
+      <div className="border-t border-slate-200">
+        <PropertyReviews listingId={listingId} />
       </div>
 
-      {/* CTA Section */}
-      <section className="bg-gradient-to-br from-indigo-600 to-violet-600 py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Book Your Stay?
-          </h2>
-          <p className="text-indigo-100 mb-8 text-lg">
-            Experience the best of London with Flex Living
-          </p>
-          <button className="px-8 py-4 bg-white text-indigo-600 rounded-xl font-semibold text-lg hover:bg-indigo-50 transition-colors shadow-xl">
-            Check Availability
-          </button>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="bg-slate-900 py-12">
+      <footer className="bg-slate-900 py-8">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">FL</span>
+              <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">FL</span>
               </div>
-              <span className="font-bold text-xl text-white">Flex Living</span>
+              <span className="font-semibold text-white">Flex Living</span>
             </div>
-            <p className="text-slate-400 text-sm">
-              © 2024 Flex Living. All rights reserved.
+            <p className="text-slate-500 text-sm">
+              Demo Version · © 2025 Flex Living
             </p>
           </div>
         </div>
@@ -323,4 +379,3 @@ export default async function PropertyPage({
     </div>
   );
 }
-

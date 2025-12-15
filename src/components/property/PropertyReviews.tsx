@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { NormalizedReview } from "@/types/review";
+import type { NormalizedReview } from "@/types/review";
 import { StarRating } from "@/components/dashboard/StarRating";
 
 interface PropertyReviewsProps {
@@ -22,7 +22,7 @@ function ReviewItem({ review }: { review: NormalizedReview }) {
     <div className="py-6 border-b border-slate-100 last:border-b-0">
       <div className="flex items-start gap-4">
         {/* Avatar */}
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-200/50">
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-teal-200/50">
           <span className="text-white font-semibold text-lg">
             {review.guestName.charAt(0).toUpperCase()}
           </span>
@@ -46,14 +46,16 @@ function ReviewItem({ review }: { review: NormalizedReview }) {
             <div className="flex flex-wrap gap-2 mt-4">
               {Object.entries(review.categories)
                 .filter(([key]) =>
-                  ["cleanliness", "communication", "location", "value"].includes(key)
+                  ["cleanliness", "communication", "respectHouseRules"].includes(key)
                 )
                 .map(([key, value]) => (
                   <span
                     key={key}
                     className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-full text-xs"
                   >
-                    <span className="text-slate-500 capitalize">{key}</span>
+                    <span className="text-slate-500 capitalize">
+                      {key === "respectHouseRules" ? "House Rules" : key}
+                    </span>
                     <span className="font-semibold text-slate-700">{value}</span>
                   </span>
                 ))}
@@ -88,7 +90,7 @@ export function PropertyReviews({ listingId }: PropertyReviewsProps) {
   if (loading) {
     return (
       <div className="py-12 flex justify-center">
-        <div className="w-8 h-8 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
       </div>
     );
   }
@@ -124,21 +126,23 @@ export function PropertyReviews({ listingId }: PropertyReviewsProps) {
         </div>
 
         {/* Rating breakdown */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-6 bg-slate-50 rounded-2xl">
+        <div className="grid grid-cols-3 gap-4 mb-8 p-6 bg-slate-50 rounded-2xl">
           {[
             { key: "cleanliness", label: "Cleanliness", icon: "✨" },
             { key: "communication", label: "Communication", icon: "💬" },
-            { key: "checkIn", label: "Check-in", icon: "🔑" },
-            { key: "location", label: "Location", icon: "📍" },
+            { key: "respectHouseRules", label: "House Rules", icon: "📋" },
           ].map(({ key, label, icon }) => {
+            const reviewsWithCategory = reviews.filter(
+              (r) => r.categories[key as keyof typeof r.categories]
+            );
             const avg =
-              reviews
-                .filter((r) => r.categories[key as keyof typeof r.categories])
-                .reduce(
-                  (sum, r) =>
-                    sum + (r.categories[key as keyof typeof r.categories] || 0),
-                  0
-                ) / reviews.length || 0;
+              reviewsWithCategory.length > 0
+                ? reviewsWithCategory.reduce(
+                    (sum, r) =>
+                      sum + (r.categories[key as keyof typeof r.categories] || 0),
+                    0
+                  ) / reviewsWithCategory.length
+                : 0;
 
             return (
               <div key={key} className="text-center">
@@ -162,4 +166,3 @@ export function PropertyReviews({ listingId }: PropertyReviewsProps) {
     </section>
   );
 }
-

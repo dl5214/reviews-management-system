@@ -9,8 +9,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Flex Living | Premium London Apartments",
-  description: "Reviews management dashboard for Flex Living properties",
+  title: "Flex Living | Reviews Management Demo",
+  description: "Demo reviews management dashboard for Flex Living properties",
 };
 
 export default function RootLayout({

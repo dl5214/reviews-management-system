@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { mockHostawayReviews, getUniqueListings, getUniqueChannels } from "@/lib/mock-data";
-import { isReviewApproved } from "@/lib/store";
+import { getReviewStatus } from "@/lib/store";
 import { HostawayReview, NormalizedReview } from "@/types/review";
 
 // Normalize category name to camelCase key
@@ -19,24 +19,20 @@ function normalizeCategoryKey(category: string): string {
   return mapping[category.toLowerCase()] || category;
 }
 
-// Convert Hostaway rating (1-10) to standard (1-5)
+// Keep Hostaway rating as-is (1-10 scale)
 function convertRating(rating: number | null): number | null {
   if (rating === null) return null;
-  return Math.round((rating / 10) * 5 * 10) / 10; // Round to 1 decimal
+  return Math.round(rating * 10) / 10; // Round to 1 decimal, keep 10-scale
 }
 
-// Calculate average from category ratings
+// Calculate average from category ratings (keep 10-scale)
 function calculateAverageFromCategories(
   categories: { category: string; rating: number }[]
 ): number | null {
-  const validRatings = categories.filter(
-    (c) =>
-      c.rating !== null &&
-      !["respect_house_rules", "overall"].includes(c.category.toLowerCase())
-  );
+  const validRatings = categories.filter((c) => c.rating !== null);
   if (validRatings.length === 0) return null;
   const sum = validRatings.reduce((acc, c) => acc + c.rating, 0);
-  return Math.round((sum / validRatings.length / 10) * 5 * 10) / 10;
+  return Math.round((sum / validRatings.length) * 10) / 10; // Keep 10-scale
 }
 
 // Normalize a single Hostaway review
@@ -72,7 +68,7 @@ function normalizeReview(review: HostawayReview): NormalizedReview {
     listingId: review.listingId?.toString() || "unknown",
     listingName: review.listingName,
     channel: review.channelName || "Direct",
-    isApproved: isReviewApproved(review.id),
+    approvalStatus: getReviewStatus(review.id),
   };
 }
 
@@ -85,7 +81,6 @@ export async function GET(request: Request) {
   const minRating = searchParams.get("minRating");
   const maxRating = searchParams.get("maxRating");
   const type = searchParams.get("type") as "guest-to-host" | "host-to-guest" | null;
-  const isApproved = searchParams.get("isApproved");
   const sortBy = searchParams.get("sortBy") || "submittedAt";
   const sortOrder = searchParams.get("sortOrder") || "desc";
 
@@ -116,13 +111,7 @@ export async function GET(request: Request) {
   });
 
   // Normalize reviews
-  let normalizedReviews = filteredReviews.map(normalizeReview);
-
-  // Filter by approval status after normalization
-  if (isApproved !== null) {
-    const approved = isApproved === "true";
-    normalizedReviews = normalizedReviews.filter((r) => r.isApproved === approved);
-  }
+  const normalizedReviews = filteredReviews.map(normalizeReview);
 
   // Sort reviews
   normalizedReviews.sort((a, b) => {
