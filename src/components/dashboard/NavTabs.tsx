@@ -7,6 +7,7 @@ const navItems = [
   { href: "/dashboard", label: "Reviews" },
   { href: "/dashboard/properties", label: "Properties" },
   { href: "/dashboard/channels", label: "Channels" },
+  { href: "/dashboard/analytics", label: "Analytics" },
   { href: "/dashboard/profile", label: "Profile" },
 ];
 
@@ -48,7 +49,7 @@ export function NavTabs() {
 
       {/* Mobile: Bottom navigation */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-slate-300 z-50 safe-area-bottom shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-5">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
