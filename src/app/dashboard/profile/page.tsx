@@ -54,7 +54,7 @@ export default function ProfilePage() {
   const handleLogout = () => {
     document.cookie = "isLoggedIn=; path=/; max-age=0";
     document.cookie = "userName=; path=/; max-age=0";
-    router.push("/login");
+    router.push("/");
   };
 
   if (loading) {

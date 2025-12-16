@@ -508,7 +508,10 @@ export default function PropertyPage({ params }: { params: Promise<{ listingId: 
                 <div className="w-8 h-8 bg-teal-700 rounded flex items-center justify-center">
                   <span className="text-white font-bold text-xs">FL</span>
                 </div>
-                <span className="font-medium text-teal-800">Flex Living</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-teal-800">Flex Living</span>
+                  <span className="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">Demo</span>
+                </div>
               </Link>
               <nav className="hidden md:flex items-center gap-6 text-sm text-slate-600">
                 <Link href="/" className="hover:text-teal-700">All listings</Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { NavTabs } from "@/components/dashboard/NavTabs";
 import { useState, useEffect } from "react";
@@ -11,12 +11,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     const fetchPending = async () => {
       try {
-        const res = await fetch("/api/reviews/hostaway?type=guest-to-host");
+        const res = await fetch("/api/reviews/hostaway?type=guest-to-host&_t=" + Date.now());
         const data = await res.json();
         const pending = data.result?.filter((r: { approvalStatus: string }) => r.approvalStatus === "pending").length || 0;
         setPendingCount(pending);
@@ -24,18 +25,27 @@ export default function DashboardLayout({
         console.error(e);
       }
     };
-    fetchPending();
+    
+    // Fetch on mount and when returning from tasks page
+    if (pathname !== "/dashboard/tasks") {
+      fetchPending();
+    }
 
     const handleFocus = () => fetchPending();
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, []);
+  }, [pathname]);
 
   const handleLogout = () => {
     document.cookie = "isLoggedIn=; path=/; max-age=0";
     document.cookie = "userName=; path=/; max-age=0";
-    window.location.href = "/login";
+    window.location.href = "/";
   };
+
+  // If on tasks page, render only children (tasks has its own layout)
+  if (pathname === "/dashboard/tasks") {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 pb-16 sm:pb-0">

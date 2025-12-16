@@ -100,7 +100,7 @@ export function MultiSelect({
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => toggleOption(option.value)}
-                  className="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
+                  className="w-4 h-4 flex-shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
                 />
                 <span
                   className={`text-xs sm:text-sm ${
@@ -209,7 +209,7 @@ export function RatingMultiSelect({
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => toggleRating(rating)}
-                  className="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
+                  className="w-4 h-4 flex-shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
                 />
                 <span
                   className={`text-xs sm:text-sm ${

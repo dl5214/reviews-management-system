@@ -55,6 +55,14 @@ function getRelativeTime(dateString: string): string {
   return `${Math.floor(diffInDays / 365)} years ago`;
 }
 
+function formatPropertyName(listingName: string): string {
+  const prefix = "Flex Living - ";
+  if (listingName.startsWith(prefix)) {
+    return listingName.slice(prefix.length);
+  }
+  return listingName;
+}
+
 function StatusDropdown({
   currentStatus,
   onStatusChange,
@@ -65,7 +73,9 @@ function StatusDropdown({
   isUpdating?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -76,6 +86,15 @@ function StatusDropdown({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const dropdownHeight = 130; // Approximate height of dropdown
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setDropUp(spaceBelow < dropdownHeight);
+    }
+  }, [isOpen]);
 
   const statusStyle = getStatusStyle(currentStatus);
   const statuses: { value: ApprovalStatus; label: string; color: string }[] = [
@@ -98,6 +117,7 @@ function StatusDropdown({
   return (
     <div ref={dropdownRef} className="relative z-20">
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${statusStyle.bg} ${statusStyle.text} hover:opacity-80`}
       >
@@ -108,8 +128,8 @@ function StatusDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1 w-36 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50">
-          {statuses.map((status) => (
+        <div className={`absolute right-0 ${dropUp ? 'bottom-full mb-1' : 'mt-1'} w-36 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50`}>
+          {statuses.map((status, index) => (
             <button
               key={status.value}
               onClick={() => {
@@ -118,7 +138,7 @@ function StatusDropdown({
               }}
               className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 flex items-center gap-2 ${
                 currentStatus === status.value ? "font-medium" : ""
-              } ${status.color}`}
+              } ${status.color} ${index < statuses.length - 1 ? "border-b border-slate-100" : ""}`}
             >
               {currentStatus === status.value && (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +171,7 @@ export function ReviewCard({
 
   return (
     <div
-      className={`relative bg-white rounded-2xl border shadow-sm transition-all duration-200 overflow-visible ${
+      className={`relative bg-white rounded-2xl border shadow-sm transition-all duration-200 ${
         review.approvalStatus === "approved"
           ? "border-emerald-200"
           : review.approvalStatus === "rejected"
@@ -159,14 +179,6 @@ export function ReviewCard({
           : "border-slate-200"
       }`}
     >
-      {/* Status indicator bar */}
-      {review.approvalStatus === "approved" && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400" />
-      )}
-      {review.approvalStatus === "rejected" && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 to-pink-400" />
-      )}
-
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-4">
@@ -184,7 +196,7 @@ export function ReviewCard({
               </span>
             </div>
             <p className="text-sm text-slate-500 truncate">
-              {review.listingName}
+              {formatPropertyName(review.listingName)}
             </p>
           </div>
 

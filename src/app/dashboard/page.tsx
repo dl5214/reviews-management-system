@@ -18,15 +18,12 @@ interface ReviewsResponse {
 
 export default function DashboardPage() {
   const [allReviews, setAllReviews] = useState<NormalizedReview[]>([]);
-  const [listings, setListings] = useState<
-    { listingId: number; listingName: string }[]
-  >([]);
   const [channels, setChannels] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingIds, setUpdatingIds] = useState<Set<number>>(new Set());
 
   // Filter states
-  const [selectedListings, setSelectedListings] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [currentStatusTab, setCurrentStatusTab] = useState<"all" | "pending" | "approved" | "rejected">("all");
@@ -44,7 +41,6 @@ export default function DashboardPage() {
       const data: ReviewsResponse = await res.json();
 
       setAllReviews(data.result);
-      setListings(data.meta.listings);
       setChannels(data.meta.channels);
     } catch (error) {
       console.error("Failed to fetch reviews:", error);
@@ -74,9 +70,13 @@ export default function DashboardPage() {
       result = result.filter((r) => r.approvalStatus === currentStatusTab);
     }
 
-    // Filter by listings
-    if (selectedListings.length > 0) {
-      result = result.filter((r) => selectedListings.includes(r.listingId));
+    // Filter by property search (fuzzy search - property name and guest name)
+    if (searchTerm.trim().length > 0) {
+      const searchLower = searchTerm.toLowerCase();
+      result = result.filter((r) => 
+        r.listingName.toLowerCase().includes(searchLower) ||
+        r.guestName.toLowerCase().includes(searchLower)
+      );
     }
 
     // Filter by channels
@@ -115,7 +115,7 @@ export default function DashboardPage() {
     return result;
   }, [
     allReviews,
-    selectedListings,
+    searchTerm,
     selectedChannels,
     selectedRatings,
     currentStatusTab,
@@ -154,7 +154,8 @@ export default function DashboardPage() {
   };
 
   const handleResetFilters = () => {
-    setSelectedListings([]);
+    setCurrentStatusTab("all");
+    setSearchTerm("");
     setSelectedChannels([]);
     setSelectedRatings([]);
   };
@@ -171,65 +172,20 @@ export default function DashboardPage() {
           <StatsCards reviews={allReviews} />
         </section>
 
-        {/* Status Tabs - Scrollable on mobile */}
-        <div className="mb-4 sm:mb-6 overflow-x-auto scrollbar-hide">
-          <div className="grid grid-cols-4 gap-1 p-1 bg-slate-100 rounded-lg w-full sm:w-auto sm:inline-grid">
-            <button
-              onClick={() => setCurrentStatusTab("all")}
-              className={`px-2 sm:px-4 py-2 rounded-md text-sm font-medium transition-colors text-center ${
-                currentStatusTab === "all"
-                  ? "bg-white text-slate-800 shadow-sm"
-                  : "text-slate-600 hover:text-slate-800"
-              }`}
-            >
-              All <span className="text-slate-400">{allReviews.length}</span>
-            </button>
-            <button
-              onClick={() => setCurrentStatusTab("pending")}
-              className={`px-2 sm:px-4 py-2 rounded-md text-sm font-medium transition-colors text-center ${
-                currentStatusTab === "pending"
-                  ? "bg-white text-amber-700 shadow-sm"
-                  : "text-slate-600 hover:text-slate-800"
-              }`}
-            >
-              Pending <span className={currentStatusTab === "pending" ? "text-amber-500" : "text-slate-400"}>{pendingCount}</span>
-            </button>
-            <button
-              onClick={() => setCurrentStatusTab("approved")}
-              className={`px-2 sm:px-4 py-2 rounded-md text-sm font-medium transition-colors text-center ${
-                currentStatusTab === "approved"
-                  ? "bg-white text-teal-700 shadow-sm"
-                  : "text-slate-600 hover:text-slate-800"
-              }`}
-            >
-              Approved <span className={currentStatusTab === "approved" ? "text-teal-500" : "text-slate-400"}>{approvedCount}</span>
-            </button>
-            <button
-              onClick={() => setCurrentStatusTab("rejected")}
-              className={`px-2 sm:px-4 py-2 rounded-md text-sm font-medium transition-colors text-center ${
-                currentStatusTab === "rejected"
-                  ? "bg-white text-rose-700 shadow-sm"
-                  : "text-slate-600 hover:text-slate-800"
-              }`}
-            >
-              Rejected <span className={currentStatusTab === "rejected" ? "text-rose-500" : "text-slate-400"}>{rejectedCount}</span>
-            </button>
-          </div>
-        </div>
-
         {/* Filters */}
         <section className="mb-6 sm:mb-8">
           <FilterBar
-            listings={listings}
             channels={channels}
-            selectedListings={selectedListings}
+            searchTerm={searchTerm}
             selectedChannels={selectedChannels}
             selectedRatings={selectedRatings}
             sortOption={sortOption}
-            onListingsChange={setSelectedListings}
+            currentStatusTab={currentStatusTab}
+            onSearchChange={setSearchTerm}
             onChannelsChange={setSelectedChannels}
             onRatingsChange={setSelectedRatings}
             onSortChange={setSortOption}
+            onStatusTabChange={setCurrentStatusTab}
             onReset={handleResetFilters}
           />
         </section>
