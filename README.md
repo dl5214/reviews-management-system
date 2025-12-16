@@ -43,6 +43,7 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 ### ✅ 2. Manager Dashboard (`/dashboard`)
 
 - **Multi-view navigation**: Switch between **Dashboard / Properties / Channels** views
+- **Analytics**: Dedicated `/dashboard/analytics` page for weekly trends and recent low reviews
 - **Searching & Filtering & Sorting**: By property, channel, rating, status, time
 - **Statistics**: Total reviews, average rating, approval status breakdown
 - **Rating Distribution**: Visual bar chart showing 1-5 star distribution
@@ -220,6 +221,7 @@ Get approved reviews for public display.
 | `/dashboard/channels/[channel]` | Protected | Channel drill-down |
 | `/dashboard/tasks` | Protected | Task-based approval workflow |
 | `/dashboard/profile` | Protected | Manager profile card |
+| `/dashboard/analytics` | Protected | Reviews analytics and trends |
 | `/reviews` | Public | All approved reviews |
 | `/property/[id]` | Public | Property details + approved reviews |
 
