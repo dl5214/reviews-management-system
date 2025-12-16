@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { NormalizedReview, ApprovalStatus } from "@/types/review";
 import { ReviewCard } from "@/components/dashboard/ReviewCard";
+import { ReviewStatusTabs } from "@/components/dashboard/ReviewStatusTabs";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 
 
@@ -111,49 +112,17 @@ export default function ChannelReviewsPage({ params }: { params: Promise<{ chann
       </div>
 
       {/* Status Tabs */}
-      <div className="mb-6 overflow-x-auto">
-        <div className="inline-flex gap-1 p-1 bg-slate-100 rounded-lg">
-          <button
-            onClick={() => setStatusFilter("all")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              statusFilter === "all"
-                ? "bg-white text-slate-800 shadow-sm"
-                : "text-slate-600 hover:text-slate-800"
-            }`}
-          >
-            All <span className="text-slate-400">{reviews.length}</span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("pending")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              statusFilter === "pending"
-                ? "bg-white text-amber-700 shadow-sm"
-                : "text-slate-600 hover:text-slate-800"
-            }`}
-          >
-            Pending <span className={statusFilter === "pending" ? "text-amber-500" : "text-slate-400"}>{pendingCount}</span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("approved")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              statusFilter === "approved"
-                ? "bg-white text-teal-700 shadow-sm"
-                : "text-slate-600 hover:text-slate-800"
-            }`}
-          >
-            Approved <span className={statusFilter === "approved" ? "text-teal-500" : "text-slate-400"}>{approvedCount}</span>
-          </button>
-          <button
-            onClick={() => setStatusFilter("rejected")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              statusFilter === "rejected"
-                ? "bg-white text-rose-700 shadow-sm"
-                : "text-slate-600 hover:text-slate-800"
-            }`}
-          >
-            Rejected <span className={statusFilter === "rejected" ? "text-rose-500" : "text-slate-400"}>{rejectedCount}</span>
-          </button>
-        </div>
+      <div className="mb-6">
+        <ReviewStatusTabs
+            value={statusFilter}
+            onChange={setStatusFilter}
+            counts={{
+              all: reviews.length,
+              pending: pendingCount,
+              approved: approvedCount,
+              rejected: rejectedCount,
+            }}
+        />
       </div>
 
       {/* Reviews */}

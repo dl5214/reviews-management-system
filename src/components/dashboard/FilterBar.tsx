@@ -1,6 +1,7 @@
 "use client";
 
 import { MultiSelect, RatingMultiSelect } from "./MultiSelect";
+import { ReviewStatusTabs } from "@/components/dashboard/ReviewStatusTabs";
 
 interface FilterBarProps {
   channels: string[];
@@ -66,31 +67,12 @@ export function FilterBar({
 
       {/* Status Tabs */}
       <div className="mb-4">
-        <label className="block text-xs font-medium text-slate-500 mb-1 sm:mb-1.5">
-          Review Status
-        </label>
-        <div className="bg-slate-100 rounded-lg p-1 sm:p-0 sm:h-[42px] sm:px-3 sm:flex sm:items-center">
-          <div className="grid grid-cols-4 gap-1 sm:gap-4 w-full">
-            {[
-              { value: "all", label: "All", color: "" },
-              { value: "pending", label: "Pending", color: "bg-amber-50" },
-              { value: "approved", label: "Approved", color: "bg-teal-50" },
-              { value: "rejected", label: "Rejected", color: "bg-rose-50" },
-            ].map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => onStatusTabChange(tab.value as any)}
-                className={`py-2 sm:py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
-                  currentStatusTab === tab.value
-                    ? `${tab.color || "bg-white"} text-slate-800 shadow-sm`
-                    : "text-slate-600 hover:text-slate-800 hover:bg-slate-200"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ReviewStatusTabs
+            label="Review Status"
+            value={currentStatusTab}
+            onChange={onStatusTabChange}
+            showCounts={false}
+        />
       </div>
 
       {/* Search - Full width on mobile */}
