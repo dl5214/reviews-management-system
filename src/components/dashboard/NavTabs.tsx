@@ -56,14 +56,13 @@ export function NavTabs() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center py-2 text-xs font-medium transition-colors gap-1 ${
-                  active 
-                    ? "text-teal-600" 
+                className={`flex items-center justify-center py-5 text-sm font-medium transition-colors ${
+                  active
+                    ? "text-teal-600 ring-4 ring-inset ring-teal-500/50 rounded-lg"
                     : "text-slate-500"
                 }`}
               >
-                <div className={`w-10 h-0.5 rounded-full transition-colors ${active ? "bg-teal-600" : "bg-transparent"}`} />
-                {item.label}
+                <span>{item.label}</span>
               </Link>
             );
           })}
@@ -72,4 +71,3 @@ export function NavTabs() {
     </>
   );
 }
-

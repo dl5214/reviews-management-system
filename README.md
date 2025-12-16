@@ -84,12 +84,13 @@ src/
 │   │   ├── properties/
 │   │   │   ├── [listingId]/page.tsx# Property drill-down
 │   │   │   └── page.tsx            # Property overview
+│   │   ├── analytics/page.tsx      # Analytics tab
+│   │   ├── profile/page.tsx        # Manager profile card
 │   │   ├── tasks/
 │   │   │   ├── layout.tsx
 │   │   │   └── page.tsx            # Task-based review approval flow
 │   │   ├── layout.tsx
-│   │   ├── page.tsx                # Manager dashboard home
-│   │   └── profile/page.tsx        # Manager profile card
+│   │   └── page.tsx                # Manager dashboard home
 │   ├── property/[listingId]/page.tsx # Public property page
 │   ├── reviews/page.tsx            # Public approved reviews listing
 │   ├── login/page.tsx              # Manager authentication
