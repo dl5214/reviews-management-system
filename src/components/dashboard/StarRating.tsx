@@ -1,7 +1,7 @@
 "use client";
 
 interface StarRatingProps {
-  rating: number | null;  // Rating in 10-scale
+  rating: number | null;  // Rating in 5-scale
   size?: "sm" | "md" | "lg";
   showNumber?: boolean;
 }
@@ -27,17 +27,19 @@ export function StarRating({
     lg: "w-5 h-5",
   };
 
-  // Convert 10-scale to 5 stars (each star = 2 points)
-  const starRating = rating / 2;
-  const fullStars = Math.floor(starRating);
-  const hasHalfStar = starRating % 1 >= 0.5;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  // Rating is already in 5-scale
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.25 && rating % 1 < 0.75;
+  const roundUp = rating % 1 >= 0.75;
+  const displayFullStars = roundUp ? fullStars + 1 : fullStars;
+  const displayHalfStar = !roundUp && hasHalfStar;
+  const emptyStars = 5 - displayFullStars - (displayHalfStar ? 1 : 0);
 
   return (
     <div className={`flex items-center gap-1 ${sizeClasses[size]}`}>
       <div className="flex items-center">
         {/* Full stars */}
-        {Array.from({ length: fullStars }).map((_, i) => (
+        {Array.from({ length: displayFullStars }).map((_, i) => (
           <svg
             key={`full-${i}`}
             className={`${starSizeClasses[size]} text-amber-400`}
@@ -48,7 +50,7 @@ export function StarRating({
           </svg>
         ))}
         {/* Half star */}
-        {hasHalfStar && (
+        {displayHalfStar && (
           <svg
             className={`${starSizeClasses[size]} text-amber-400`}
             fill="currentColor"
@@ -79,7 +81,7 @@ export function StarRating({
         ))}
       </div>
       {showNumber && (
-        <span className="font-medium text-slate-600 ml-1">{rating.toFixed(1)}</span>
+        <span className="font-medium text-slate-600 ml-1">{rating.toFixed(2)}</span>
       )}
     </div>
   );

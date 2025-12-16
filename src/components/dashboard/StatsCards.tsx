@@ -19,12 +19,12 @@ export function StatsCards({ reviews }: StatsCardsProps) {
         reviewsWithRating.length
       : 0;
 
-  // Calculate rating distribution (10-scale, grouped by 2)
-  const ratingDistribution = [10, 8, 6, 4, 2].map((rating) => {
+  // Calculate rating distribution (5-scale)
+  const ratingDistribution = [5, 4, 3, 2, 1].map((rating) => {
     const count = reviews.filter(
       (r) =>
         r.averageRating !== null &&
-        r.averageRating > rating - 2 &&
+        r.averageRating > rating - 1 &&
         r.averageRating <= rating
     ).length;
     return { rating, count, percentage: totalReviews > 0 ? (count / totalReviews) * 100 : 0 };
@@ -131,16 +131,17 @@ export function StatsCards({ reviews }: StatsCardsProps) {
         <div className="space-y-2 sm:space-y-3">
           {ratingDistribution.map((item) => (
             <div key={item.rating} className="flex items-center gap-2 sm:gap-3">
-              <span className="text-xs sm:text-sm font-medium text-slate-600 w-10 sm:w-12 shrink-0">
-                {item.rating - 1}-{item.rating}
-              </span>
+              <div className="flex items-center gap-2 w-10 sm:w-12 shrink-0">
+                <span className="text-xs sm:text-sm font-medium text-slate-700">{item.rating}</span>
+                <span className="text-amber-400 text-sm">★</span>
+              </div>
               <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-amber-400 rounded-full transition-all duration-500"
                   style={{ width: `${item.percentage}%` }}
                 />
               </div>
-              <span className="text-xs sm:text-sm text-slate-500 w-6 sm:w-8 text-right tabular-nums">
+              <span className="text-xs sm:text-sm text-slate-500 w-6 sm:w-8 text-center tabular-nums">
                 {item.count}
               </span>
             </div>

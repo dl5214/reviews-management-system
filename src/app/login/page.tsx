@@ -111,7 +111,7 @@ function LoginForm() {
       {/* Demo Credentials Hint */}
       <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
         <p className="text-xs text-amber-700 text-center mb-2 font-medium">
-          Demo Credentials
+          Demo Credentials (Already Prefilled)
         </p>
         <div className="flex items-center justify-center gap-6 text-sm">
           <div className="text-center">
@@ -127,6 +127,9 @@ function LoginForm() {
             </code>
           </div>
         </div>
+        <p className="text-xs text-amber-600 text-center mt-2">
+          Just click "Sign In" to continue
+        </p>
       </div>
     </form>
   );
@@ -142,9 +145,16 @@ export default function LoginPage() {
             <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">FL</span>
             </div>
-            <span className="font-semibold text-xl text-slate-800">
-              Flex Living
-            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-xl text-slate-800">
+                  Flex Living
+                </span>
+                <span className="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">
+                  Demo
+                </span>
+              </div>
+            </div>
           </Link>
         </div>
       </header>

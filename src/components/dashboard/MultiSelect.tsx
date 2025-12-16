@@ -100,7 +100,7 @@ export function MultiSelect({
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => toggleOption(option.value)}
-                  className="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
+                  className="w-4 h-4 flex-shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
                 />
                 <span
                   className={`text-xs sm:text-sm ${
@@ -161,7 +161,7 @@ export function RatingMultiSelect({
       ? "All"
       : selected
           .sort((a, b) => b - a)
-          .map((r) => `${r - 1}-${r}`)
+          .map((r) => `${r}★`)
           .join(", ");
 
   return (
@@ -198,7 +198,7 @@ export function RatingMultiSelect({
 
       {isOpen && (
         <div className="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg py-1">
-          {[10, 8, 6, 4, 2].map((rating) => {
+          {[5, 4, 3, 2, 1].map((rating) => {
             const isSelected = selected.includes(rating);
             return (
               <label
@@ -209,14 +209,14 @@ export function RatingMultiSelect({
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => toggleRating(rating)}
-                  className="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
+                  className="w-4 h-4 flex-shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
                 />
                 <span
                   className={`text-xs sm:text-sm ${
                     isSelected ? "text-slate-800 font-medium" : "text-slate-600"
                   }`}
                 >
-                  {rating - 1}-{rating}
+                  {rating}★
                 </span>
               </label>
             );

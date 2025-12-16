@@ -69,9 +69,16 @@ export default function Home() {
               <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">FL</span>
               </div>
-              <span className="font-semibold text-xl text-slate-800">
-                Flex Living
-              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-xl text-slate-800">
+                    Flex Living
+                  </span>
+                  <span className="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">
+                    Demo
+                  </span>
+                </div>
+              </div>
             </div>
 
             <nav className="hidden md:flex items-center gap-8">

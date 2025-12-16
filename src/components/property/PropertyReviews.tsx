@@ -2,67 +2,70 @@
 
 import { useState, useEffect } from "react";
 import type { NormalizedReview } from "@/types/review";
-import { StarRating } from "@/components/dashboard/StarRating";
 
 interface PropertyReviewsProps {
   listingId: string;
 }
 
-function formatDate(dateString: string): string {
+function formatMonth(dateString: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
+  return date.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
 }
 
-function ReviewItem({ review }: { review: NormalizedReview }) {
+// Star rating display
+function Stars({ rating }: { rating: number }) {
+  const fullStars = Math.floor(rating);
+  const hasHalf = rating % 1 >= 0.25 && rating % 1 < 0.75;
+  const roundUp = rating % 1 >= 0.75;
+  const displayFull = roundUp ? fullStars + 1 : fullStars;
+  const displayHalf = !roundUp && hasHalf;
+  const empty = 5 - displayFull - (displayHalf ? 1 : 0);
+
   return (
-    <div className="py-6 border-b border-slate-100 last:border-b-0">
-      <div className="flex items-start gap-4">
-        {/* Avatar */}
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-teal-200/50">
-          <span className="text-white font-semibold text-lg">
-            {review.guestName.charAt(0).toUpperCase()}
-          </span>
-        </div>
+    <span className="inline-flex">
+      {Array.from({ length: displayFull }).map((_, i) => (
+        <span key={`full-${i}`} className="text-teal-700">★</span>
+      ))}
+      {displayHalf && <span className="text-teal-700">★</span>}
+      {Array.from({ length: Math.max(0, empty) }).map((_, i) => (
+        <span key={`empty-${i}`} className="text-slate-300">☆</span>
+      ))}
+    </span>
+  );
+}
 
-        <div className="flex-1 min-w-0">
-          {/* Guest info and rating */}
-          <div className="flex items-center justify-between gap-4 mb-2">
-            <div>
-              <h4 className="font-semibold text-slate-800">{review.guestName}</h4>
-              <p className="text-sm text-slate-500">{formatDate(review.submittedAt)}</p>
-            </div>
-            <StarRating rating={review.averageRating} size="md" />
-          </div>
+function ReviewItem({ review }: { review: NormalizedReview }) {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = review.publicReview.length > 180;
+  const displayText = expanded || !isLong 
+    ? review.publicReview 
+    : review.publicReview.slice(0, 180) + "...";
 
-          {/* Review text */}
-          <p className="text-slate-600 leading-relaxed">{review.publicReview}</p>
-
-          {/* Category badges */}
-          {Object.keys(review.categories).length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {Object.entries(review.categories)
-                .filter(([key]) =>
-                  ["cleanliness", "communication", "respectHouseRules"].includes(key)
-                )
-                .map(([key, value]) => (
-                  <span
-                    key={key}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-full text-xs"
-                  >
-                    <span className="text-slate-500 capitalize">
-                      {key === "respectHouseRules" ? "House Rules" : key}
-                    </span>
-                    <span className="font-semibold text-slate-700">{value}</span>
-                  </span>
-                ))}
-            </div>
-          )}
-        </div>
+  return (
+    <div className="py-5 border-b border-slate-100 last:border-b-0">
+      {/* Header: Stars · Name · Date */}
+      <div className="flex items-center gap-2 mb-2 text-sm">
+        <Stars rating={review.averageRating || 5} />
+        <span className="text-slate-400">·</span>
+        <span className="font-medium text-slate-800">{review.guestName}</span>
+        <span className="text-slate-400">·</span>
+        <span className="text-slate-600">{formatMonth(review.submittedAt)}</span>
       </div>
+
+      {/* Review Content */}
+      <p className="text-slate-600 leading-relaxed">{displayText}</p>
+      
+      {isLong && !expanded && (
+        <button 
+          onClick={() => setExpanded(true)}
+          className="text-slate-800 underline text-sm mt-2 font-medium"
+        >
+          Show more
+        </button>
+      )}
     </div>
   );
 }
@@ -70,6 +73,7 @@ function ReviewItem({ review }: { review: NormalizedReview }) {
 export function PropertyReviews({ listingId }: PropertyReviewsProps) {
   const [reviews, setReviews] = useState<NormalizedReview[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -89,14 +93,19 @@ export function PropertyReviews({ listingId }: PropertyReviewsProps) {
 
   if (loading) {
     return (
-      <div className="py-12 flex justify-center">
-        <div className="w-8 h-8 border-3 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
+      <div className="py-8 flex justify-center">
+        <div className="w-6 h-6 border-2 border-teal-200 border-t-teal-700 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (reviews.length === 0) {
-    return null;
+    return (
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-teal-800 mb-4">Reviews</h2>
+        <p className="text-slate-500">No approved reviews yet</p>
+      </div>
+    );
   }
 
   // Calculate average rating
@@ -107,62 +116,34 @@ export function PropertyReviews({ listingId }: PropertyReviewsProps) {
         reviewsWithRating.length
       : 0;
 
+  const displayedReviews = showAll ? reviews : reviews.slice(0, 5);
+
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-4xl mx-auto px-6">
-        {/* Section header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-1">
-              Guest Reviews
-            </h2>
-            <div className="flex items-center gap-3">
-              <StarRating rating={averageRating} size="lg" />
-              <span className="text-slate-500">
-                · {reviews.length} review{reviews.length !== 1 ? "s" : ""}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Rating breakdown */}
-        <div className="grid grid-cols-3 gap-4 mb-8 p-6 bg-slate-50 rounded-2xl">
-          {[
-            { key: "cleanliness", label: "Cleanliness", icon: "✨" },
-            { key: "communication", label: "Communication", icon: "💬" },
-            { key: "respectHouseRules", label: "House Rules", icon: "📋" },
-          ].map(({ key, label, icon }) => {
-            const reviewsWithCategory = reviews.filter(
-              (r) => r.categories[key as keyof typeof r.categories]
-            );
-            const avg =
-              reviewsWithCategory.length > 0
-                ? reviewsWithCategory.reduce(
-                    (sum, r) =>
-                      sum + (r.categories[key as keyof typeof r.categories] || 0),
-                    0
-                  ) / reviewsWithCategory.length
-                : 0;
-
-            return (
-              <div key={key} className="text-center">
-                <div className="text-2xl mb-1">{icon}</div>
-                <div className="text-xl font-bold text-slate-800">
-                  {avg.toFixed(1)}
-                </div>
-                <div className="text-sm text-slate-500">{label}</div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Reviews list */}
-        <div className="divide-y divide-slate-100">
-          {reviews.map((review) => (
-            <ReviewItem key={review.id} review={review} />
-          ))}
-        </div>
+    <div className="mb-8">
+      {/* Section header */}
+      <div className="flex items-center gap-2 mb-6">
+        <h2 className="text-xl font-bold text-teal-800">Reviews</h2>
+        <span className="text-amber-400 text-xl">★</span>
+        <span className="font-semibold text-slate-800">{averageRating.toFixed(2)}</span>
+        <span className="text-slate-500">({reviews.length})</span>
       </div>
-    </section>
+
+      {/* Reviews list */}
+      <div>
+        {displayedReviews.map((review) => (
+          <ReviewItem key={review.id} review={review} />
+        ))}
+      </div>
+
+      {/* Show all button */}
+      {reviews.length > 5 && !showAll && (
+        <button 
+          onClick={() => setShowAll(true)}
+          className="mt-6 px-5 py-2.5 border border-slate-300 rounded-full text-sm font-medium text-slate-800 hover:bg-slate-50"
+        >
+          Show all {reviews.length} reviews
+        </button>
+      )}
+    </div>
   );
 }
