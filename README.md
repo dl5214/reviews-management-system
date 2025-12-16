@@ -15,6 +15,14 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 
 ---
 
+## Deployment
+
+This project is deployed on **Vercel**: https://reviews-management-system-nu.vercel.app
+
+CI/CD: Changes pushed to the `main` branch automatically trigger a build and deployment on Vercel.
+
+---
+
 ## Tech Stack
 
 | Technology | Version | Purpose |
@@ -28,7 +36,7 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 
 ## Features Implemented
 
-### ✅ 1. Hostaway Integration (Mocked)
+### 1. Hostaway Integration (Mocked)
 
 - **API Route**: `GET /api/reviews/hostaway`
 - Parses and normalizes reviews by:
@@ -40,7 +48,7 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 - Supports filtering by listing, channel, rating range, type
 - Supports sorting by date, rating, guest name, listing
 
-### ✅ 2. Manager Dashboard (`/dashboard`)
+### 2. Manager Dashboard (`/dashboard`)
 
 - **Multi-view navigation**: Switch between **Dashboard / Properties / Channels** views
 - **Analytics**: Dedicated `/dashboard/analytics` page for weekly trends and recent low reviews
@@ -50,14 +58,14 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 - **Review Approval**: Select which reviews appear on public pages
 - **Task-based Workflow**: Dedicated `/dashboard/tasks` page for efficient review processing
 
-### ✅ 3. Review Display Page
+### 3. Review Display Page
 
 - **Property Pages**: `/property/[listingId]` with Flex Living-style layout
 - **Public Reviews Page**: `/reviews` showing all approved reviews grouped by property
 - **Approval Control**: Only approved reviews displayed publicly
 - **Consistent Design**: Teal/green color scheme matching Flex Living branding
 
-### ⏳ 4. Google Reviews (Exploration)
+### 4. Google Reviews (Exploration)
 
 > **Finding**: Google Places API requires business verification and API key setup. Integration is feasible but requires:
 > - Google Cloud Console project with Places API enabled
@@ -139,7 +147,7 @@ Fetch and normalize reviews from Hostaway (mocked).
 | `sortOrder` | string | `asc` or `desc` |
 
 **Response:**
-```json
+```text
 {
   "status": "success",
   "result": [...normalizedReviews],
@@ -156,7 +164,7 @@ Fetch and normalize reviews from Hostaway (mocked).
 Update a single review approval status.
 
 **Body:**
-```json
+```text
 {
   "reviewId": 7453,
   "status": "approved" | "pending" | "rejected"
@@ -168,7 +176,7 @@ Update a single review approval status.
 Bulk update review approval statuses.
 
 **Body:**
-```json
+```text
 {
   "reviewIds": [7453, 7454],
   "status": "approved" | "pending" | "rejected"
