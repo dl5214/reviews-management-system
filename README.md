@@ -18,7 +18,7 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 ## Tech Stack
 
 | Technology | Version | Purpose |
-|------------|---------|---------|
+|------------|:-------:|---------|
 | Next.js | 16 | Full-stack React framework (App Router) |
 | TypeScript | 5 | Type safety |
 | Tailwind CSS | 4 | Styling |

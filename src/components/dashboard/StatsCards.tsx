@@ -31,9 +31,10 @@ export function StatsCards({ reviews }: StatsCardsProps) {
   });
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
       {/* Main Stats Card */}
-      <div className="lg:col-span-8 bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6">
+      <div className="lg:col-span-8 lg:pr-6 lg:border-r lg:border-slate-100">
         <div className="grid grid-cols-4 gap-2 sm:gap-6">
           {/* Total */}
           <div className="text-center">
@@ -92,15 +93,15 @@ export function StatsCards({ reviews }: StatsCardsProps) {
               </span>
             </div>
             <div className="h-2 bg-slate-100 rounded-full overflow-hidden flex">
-              <div 
+              <div
                 className="h-full bg-teal-500 transition-all duration-500"
                 style={{ width: `${(approvedCount / totalReviews) * 100}%` }}
               />
-              <div 
+              <div
                 className="h-full bg-amber-400 transition-all duration-500"
                 style={{ width: `${(pendingCount / totalReviews) * 100}%` }}
               />
-              <div 
+              <div
                 className="h-full bg-rose-400 transition-all duration-500"
                 style={{ width: `${(rejectedCount / totalReviews) * 100}%` }}
               />
@@ -124,7 +125,7 @@ export function StatsCards({ reviews }: StatsCardsProps) {
       </div>
 
       {/* Rating Distribution */}
-      <div className="lg:col-span-4 bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6">
+      <div className="lg:col-span-4 lg:pl-6">
         <h3 className="text-sm font-semibold text-slate-800 mb-3 sm:mb-4">
           Rating Distribution
         </h3>
@@ -132,7 +133,7 @@ export function StatsCards({ reviews }: StatsCardsProps) {
           {ratingDistribution.map((item) => (
             <div key={item.rating} className="flex items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-2 w-10 sm:w-12 shrink-0">
-                <span className="text-xs sm:text-sm font-medium text-slate-700">{item.rating}</span>
+                <span className="w-3 text-right tabular-nums text-xs sm:text-sm font-medium text-slate-700">{item.rating}</span>
                 <span className="text-amber-400 text-sm">★</span>
               </div>
               <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -147,6 +148,7 @@ export function StatsCards({ reviews }: StatsCardsProps) {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
