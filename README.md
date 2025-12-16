@@ -83,28 +83,28 @@ src/
 ├── app/
 │   ├── api/
 │   │   └── reviews/
-│   │       ├── approve/route.ts    # Review status management
-│   │       ├── hostaway/route.ts   # Reviews API
-│   │       └── public/route.ts     # Approved, published guest-to-host reviews
+│   │       ├── approve/route.ts      # Review status management
+│   │       ├── hostaway/route.ts     # Reviews API
+│   │       └── public/route.ts       # Approved, published guest-to-host reviews
 │   ├── dashboard/
 │   │   ├── channels/
-│   │   │   ├── [channel]/page.tsx  # Channel drill-down
-│   │   │   └── page.tsx            # Channel overview
+│   │   │   ├── [channel]/page.tsx    # Channel drill-down
+│   │   │   └── page.tsx              # Channel overview
 │   │   ├── properties/
-│   │   │   ├── [listingId]/page.tsx# Property drill-down
-│   │   │   └── page.tsx            # Property overview
-│   │   ├── analytics/page.tsx      # Analytics tab
-│   │   ├── profile/page.tsx        # Manager profile card
+│   │   │   ├── [listingId]/page.tsx  # Property drill-down
+│   │   │   └── page.tsx              # Property overview
+│   │   ├── analytics/page.tsx        # Analytics tab
+│   │   ├── profile/page.tsx          # Manager profile card
 │   │   ├── tasks/
 │   │   │   ├── layout.tsx
-│   │   │   └── page.tsx            # Task-based review approval flow
+│   │   │   └── page.tsx              # Task-based review approval flow
 │   │   ├── layout.tsx
-│   │   └── page.tsx                # Manager dashboard home
+│   │   └── page.tsx                  # Manager dashboard home
 │   ├── property/[listingId]/page.tsx # Public property page
-│   ├── reviews/page.tsx            # Public approved reviews listing
-│   ├── login/page.tsx              # Manager authentication
+│   ├── reviews/page.tsx              # Public approved reviews listing
+│   ├── login/page.tsx                # Manager authentication
 │   ├── layout.tsx
-│   ├── page.tsx                    # Landing page
+│   ├── page.tsx                      # Landing page
 │   ├── globals.css
 │   └── icon.svg
 ├── components/
@@ -120,11 +120,11 @@ src/
 │       ├── PropertyReviews.tsx
 │       └── PublicReviewsList.tsx
 ├── lib/
-│   ├── mock-data.ts                # 30 mock reviews across 5 properties
-│   └── store.ts                    # In-memory approval state
+│   ├── mock-data.ts                  # 30 mock reviews across 5 properties
+│   └── store.ts                      # In-memory approval state
 ├── types/
-│   └── review.ts                   # TypeScript interfaces
-└── middleware.ts                   # Protects /dashboard routes
+│   └── review.ts                     # TypeScript interfaces
+└── middleware.ts                     # Protects /dashboard routes
 ```
 
 ---
@@ -136,8 +136,9 @@ src/
 Fetch and normalize reviews from Hostaway (mocked).
 
 **Query Parameters:**
+
 | Param | Type | Description |
-|-------|------|-------------|
+|-------|:----:|-------------|
 | `listingId` | string | Filter by property ID |
 | `channel` | string | Filter by channel name |
 | `type` | string | `guest-to-host` or `host-to-guest` |
