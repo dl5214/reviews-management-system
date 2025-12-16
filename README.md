@@ -19,7 +19,7 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| Next.js | 15 | Full-stack React framework (App Router) |
+| Next.js | 16 | Full-stack React framework (App Router) |
 | TypeScript | 5 | Type safety |
 | Tailwind CSS | 4 | Styling |
 | React | 19 | UI components |
@@ -42,8 +42,8 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 
 ### ✅ 2. Manager Dashboard (`/dashboard`)
 
-- **Per-property performance**: Filter reviews by property
-- **Filtering & Sorting**: By rating, channel, status, time
+- **Multi-view navigation**: Switch between **Dashboard / Properties / Channels** views
+- **Searching & Filtering & Sorting**: By property, channel, rating, status, time
 - **Statistics**: Total reviews, average rating, approval status breakdown
 - **Rating Distribution**: Visual bar chart showing 1-5 star distribution
 - **Review Approval**: Select which reviews appear on public pages
@@ -72,32 +72,49 @@ Open [http://localhost:3000](http://localhost:3000) - Login credentials are pre-
 ```
 src/
 ├── app/
-│   ├── api/reviews/
-│   │   ├── hostaway/route.ts   # Main reviews API (GET with filters)
-│   │   ├── approve/route.ts    # Review status management (POST)
-│   │   └── public/route.ts     # Public reviews (approved only)
+│   ├── api/
+│   │   └── reviews/
+│   │       ├── approve/route.ts    # Review status management
+│   │       ├── hostaway/route.ts   # Reviews API
+│   │       └── public/route.ts     # Approved, published guest-to-host reviews
 │   ├── dashboard/
-│   │   ├── page.tsx            # Manager dashboard
-│   │   └── tasks/page.tsx      # Task-based review approval
-│   ├── property/[listingId]/   # Public property pages
-│   ├── reviews/page.tsx        # Public reviews listing
-│   ├── login/page.tsx          # Manager authentication
-│   └── page.tsx                # Landing page
+│   │   ├── channels/
+│   │   │   ├── [channel]/page.tsx  # Channel drill-down
+│   │   │   └── page.tsx            # Channel overview
+│   │   ├── properties/
+│   │   │   ├── [listingId]/page.tsx# Property drill-down
+│   │   │   └── page.tsx            # Property overview
+│   │   ├── tasks/
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx            # Task-based review approval flow
+│   │   ├── layout.tsx
+│   │   ├── page.tsx                # Manager dashboard home
+│   │   └── profile/page.tsx        # Manager profile card
+│   ├── property/[listingId]/page.tsx # Public property page
+│   ├── reviews/page.tsx            # Public approved reviews listing
+│   ├── login/page.tsx              # Manager authentication
+│   ├── layout.tsx
+│   ├── page.tsx                    # Landing page
+│   ├── globals.css
+│   └── icon.svg
 ├── components/
 │   ├── dashboard/
-│   │   ├── ReviewCard.tsx      # Review card with status controls
-│   │   ├── FilterBar.tsx       # Multi-select filters
-│   │   ├── StatsCards.tsx      # Statistics & charts
-│   │   ├── MultiSelect.tsx     # Reusable multi-select dropdown
-│   │   └── StarRating.tsx      # Star display component
+│   │   ├── FilterBar.tsx
+│   │   ├── MultiSelect.tsx
+│   │   ├── NavTabs.tsx
+│   │   ├── ReviewCard.tsx
+│   │   ├── ReviewStatusTabs.tsx
+│   │   ├── StarRating.tsx
+│   │   └── StatsCards.tsx
 │   └── property/
-│       └── PropertyReviews.tsx # Public reviews section
+│       ├── PropertyReviews.tsx
+│       └── PublicReviewsList.tsx
 ├── lib/
-│   ├── mock-data.ts            # 25 mock reviews, 5 properties, 3 channels
-│   └── store.ts                # In-memory approval state
+│   ├── mock-data.ts                # 30 mock reviews across 5 properties
+│   └── store.ts                    # In-memory approval state
 ├── types/
-│   └── review.ts               # TypeScript interfaces
-└── middleware.ts               # Route protection for /dashboard
+│   └── review.ts                   # TypeScript interfaces
+└── middleware.ts                   # Protects /dashboard routes
 ```
 
 ---
@@ -125,7 +142,7 @@ Fetch and normalize reviews from Hostaway (mocked).
   "status": "success",
   "result": [...normalizedReviews],
   "meta": {
-    "total": 25,
+    "total": <filteredCount>,
     "listings": [...],
     "channels": [...]
   }
@@ -134,12 +151,24 @@ Fetch and normalize reviews from Hostaway (mocked).
 
 ### POST `/api/reviews/approve`
 
-Update review approval status.
+Update a single review approval status.
 
 **Body:**
 ```json
 {
   "reviewId": 7453,
+  "status": "approved" | "pending" | "rejected"
+}
+```
+
+### PUT `/api/reviews/approve`
+
+Bulk update review approval statuses.
+
+**Body:**
+```json
+{
+  "reviewIds": [7453, 7454],
   "status": "approved" | "pending" | "rejected"
 }
 ```
@@ -155,10 +184,10 @@ Get approved reviews for public display.
 
 ## Mock Data
 
-- **25 reviews** across 5 properties
+- **30 reviews** across 5 properties
 - **3 channels**: Airbnb, Booking.com, VRBO
-- **Date range**: Oct 25, 2025 - Dec 14, 2025
-- **Rating distribution**: ~80% 5-star (realistic positive bias)
+- **Date range**: Oct 20, 2025 - Dec 14, 2025
+- **Rating mix**: Mostly 8–10s with several mid/low scores for realism
 - **Categories**: Cleanliness, Communication, House Rules
 
 ---
@@ -169,7 +198,7 @@ Get approved reviews for public display.
 
 2. **Client-side Filtering**: All filtering done client-side for instant feedback. Server fetches all reviews once.
 
-3. **Status Tabs + Filters**: Status (All/Pending/Approved/Rejected) as primary tabs, with property/channel/rating as secondary filters.
+3. **Status Tabs + Multi-view**: Status tabs (All/Pending/Approved/Rejected) with property/channel/rating filters, plus Properties/Channels views for alternate navigation.
 
 4. **In-memory State**: Approval status stored in memory for demo. Production would use database.
 
@@ -184,7 +213,12 @@ Get approved reviews for public display.
 | `/` | Public | Landing page with property listings |
 | `/login` | Public | Manager login (demo/demo) |
 | `/dashboard` | Protected | Review management dashboard |
+| `/dashboard/properties` | Protected | Property overview |
+| `/dashboard/properties/[id]` | Protected | Property drill-down |
+| `/dashboard/channels` | Protected | Channel overview |
+| `/dashboard/channels/[channel]` | Protected | Channel drill-down |
 | `/dashboard/tasks` | Protected | Task-based approval workflow |
+| `/dashboard/profile` | Protected | Manager profile card |
 | `/reviews` | Public | All approved reviews |
 | `/property/[id]` | Public | Property details + approved reviews |
 
