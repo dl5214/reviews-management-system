@@ -17,7 +17,7 @@ export default function AnalyticsPage() {
     try {
       const params = new URLSearchParams();
       params.set("type", "guest-to-host");
-      params.set("_t", Date.now().toString());
+      // params.set("_t", Date.now().toString());
 
       const res = await fetch(`/api/reviews/hostaway?${params.toString()}`);
       const data: ReviewsResponse = await res.json();
@@ -91,15 +91,17 @@ export default function AnalyticsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-stretch lg:min-h-[420px]">
-            <div className="lg:w-1/2 flex flex-col h-full">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-stretch">
+            <div className="lg:w-1/2 flex flex-col lg:h-[420px]">
               <WeeklyRatingChart weekly={weekly} />
             </div>
-            <div className="lg:w-1/2 flex flex-col h-full">
+            <div className="lg:w-1/2 flex flex-col lg:h-[420px]">
               <WeeklyApprovalTable weekly={weekly} />
             </div>
           </div>
-          <RecentLowReviews reviews={reviews} />
+          <div className="mt-8">
+            <RecentLowReviews reviews={reviews} />
+          </div>
         </div>
       )}
     </div>
@@ -130,56 +132,69 @@ function startOfWeekUtc(date: Date): Date {
 function WeeklyRatingChart({ weekly }: { weekly: WeeklyPoint[] }) {
   if (weekly.length === 0) {
     return (
-      <div className="h-full flex flex-col">
-        <h2 className="text-sm font-semibold text-slate-800 mb-3">
-          Weekly Average Rating
-        </h2>
-        <div className="flex items-center justify-center py-8 text-sm text-slate-500 border border-dashed border-slate-200 rounded-lg flex-1">
-          No data for current filters
+        <div className="h-full flex flex-col">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-slate-800">Weekly Average Rating</h3>
+            <div className="inline-flex items-center rounded-full bg-transparent p-0.5 text-[10px] w-[132px]" />
+          </div>
+          <div className="flex items-center justify-center py-8 text-sm text-slate-500 border border-dashed border-slate-200 rounded-lg flex-1">
+            No data for current filters
+          </div>
         </div>
-      </div>
     );
   }
 
   const avgAll = weekly.reduce((sum, w) => sum + w.avgRating, 0) / weekly.length;
+  const rangeLabel = `${weekly[0].weekLabel} – ${weekly[weekly.length - 1].weekLabel}`;
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold text-slate-800">
-          Weekly Average Rating
-        </h3>
-        <div className="inline-flex items-center rounded-full bg-transparent p-0.5 text-[10px] w-[132px]" />
-      </div>
-
-      <div className="border border-slate-100 rounded-lg overflow-hidden flex-1 flex flex-col">
-        <div className="divide-y divide-slate-100 overflow-auto flex-1">
-          {weekly.map((w) => (
-            <div key={w.weekLabel} className="px-3 py-2">
-              <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
-                <span className="tabular-nums">{w.weekLabel}</span>
-                <span className="font-medium text-slate-800 tabular-nums">
-                  {w.avgRating.toFixed(1)} ★ ({w.count})
-                </span>
-              </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-teal-500 rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min((w.avgRating / 5) * 100, 100)}%` }}
-                />
-              </div>
-            </div>
-          ))}
+      <div className="h-full flex flex-col">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-xs font-semibold text-slate-700">Weekly Average Rating</h3>
+          {/* Invisible toggle to match table header height exactly */}
+          <div className="inline-flex items-center rounded-full bg-slate-100 p-0.5 text-[10px] w-[132px] opacity-0 pointer-events-none">
+            <button type="button" className="px-2 py-0.5 rounded-full font-medium w-1/2 text-center">
+              Count
+            </button>
+            <button type="button" className="px-2 py-0.5 rounded-full font-medium w-1/2 text-center">
+              Percent
+            </button>
+          </div>
         </div>
 
-        <div className="px-3 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-          <span className="tabular-nums">
-            {weekly[0].weekLabel} – {weekly[weekly.length - 1].weekLabel}
-          </span>
-          <span className="font-medium text-slate-800 tabular-nums">Avg {avgAll.toFixed(1)} ★</span>
+        <div className="border border-slate-100 rounded-lg overflow-hidden flex-1 flex flex-col">
+          {/* Top summary row (same height as table header row) */}
+          <div className="grid grid-cols-2 bg-slate-50 px-3 py-2 text-[11px] font-medium text-slate-600 border-b border-slate-100">
+            <span className="truncate">{rangeLabel}</span>
+            <span className="text-right text-slate-600">Avg {avgAll.toFixed(1)} ★</span>
+          </div>
+
+          {/* N fixed rows: equal height, no scroll */}
+          <div
+            className="flex-1 grid"
+            style={{ gridTemplateRows: `repeat(${weekly.length}, minmax(0, 1fr))` }}
+          >
+            {weekly.map((w) => (
+              <div key={w.weekLabel} className="px-3 py-1 border-t border-slate-100 flex flex-col justify-center">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-600">
+                    <span>{w.weekLabel}</span>
+                    <span className="font-medium text-slate-800">
+                      {w.avgRating.toFixed(1)} ★ ({w.count})
+                    </span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-teal-500 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((w.avgRating / 5) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
   );
 }
 
@@ -234,7 +249,7 @@ function WeeklyApprovalTable({ weekly, reviews }: WeeklyApprovalTableProps) {
   if (!weekly || weekly.length === 0) {
     return (
       <div className="mb-6 sm:mb-8 flex flex-col flex-grow">
-        <h3 className="text-xs font-semibold text-slate-700 mb-2">
+        <h3 className="text-sm font-semibold text-slate-800">
           Weekly Approval Breakdown
         </h3>
         <div className="flex items-center justify-center py-8 text-sm text-slate-500 border border-dashed border-slate-200 rounded-lg flex-grow">
@@ -271,14 +286,17 @@ function WeeklyApprovalTable({ weekly, reviews }: WeeklyApprovalTableProps) {
           </button>
         </div>
       </div>
-      <div className="border border-slate-100 rounded-lg overflow-hidden flex-grow">
-        <div className="grid grid-cols-4 bg-slate-50 px-3 py-1.5 text-[11px] font-medium text-slate-600 text-center">
+      <div className="border border-slate-100 rounded-lg overflow-hidden flex-1 flex flex-col">
+        <div className="grid grid-cols-4 bg-slate-50 px-3 py-2 text-[12px] font-medium text-slate-600 text-center">
           <span>Week</span>
           <span className="text-teal-700">Approved</span>
           <span className="text-amber-700">Pending</span>
           <span className="text-rose-700">Rejected</span>
         </div>
-        <div className="divide-y divide-slate-100 overflow-auto flex-1">
+        <div
+          className="flex-1 grid"
+          style={{ gridTemplateRows: `repeat(${weekly.length}, minmax(0, 1fr))` }}
+        >
           {weekly.map((w) => {
             const total = w.approved + w.pending + w.rejected || 1;
             const approvedPct = (w.approved / total) * 100;
@@ -295,7 +313,7 @@ function WeeklyApprovalTable({ weekly, reviews }: WeeklyApprovalTableProps) {
             return (
               <div
                 key={w.weekLabel}
-                className="px-3 py-1.5 grid grid-cols-4 items-center text-[11px] text-slate-600 text-center"
+                className="px-3 py-1 border-t border-slate-100 grid grid-cols-4 items-center text-[12px] text-slate-600 text-center"
               >
                 <span className="truncate">{w.weekLabel.slice(5)}</span>
                 <span className="text-teal-700">{approvedValue}</span>
