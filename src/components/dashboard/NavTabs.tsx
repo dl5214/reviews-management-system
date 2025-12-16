@@ -58,7 +58,7 @@ export function NavTabs() {
                 href={item.href}
                 className={`flex items-center justify-center py-5 text-sm font-medium transition-colors ${
                   active
-                    ? "text-teal-600 ring-2 ring-teal-500/40 rounded-lg"
+                    ? "text-teal-600 ring-4 ring-inset ring-teal-500/50 rounded-lg"
                     : "text-slate-500"
                 }`}
               >
